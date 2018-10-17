@@ -1,4 +1,43 @@
 ##################################################################################
+#   Simulator Class
+#       Runs assembley code
+##################################################################################
+class Simulator:
+	def ADD(arg1, arg2, arg3):
+		#Code
+	def ADDI(arg1, arg2, imm):
+		#Code
+	def SUB(arg1, arg2, arg3):
+		#Code
+	def SUBI(arg1, arg2, imm):
+		#Code
+	def LSL(arg1, arg2, shift):
+		#Code
+	def LSR(arg1, arg2, shift):
+		#Code
+	def AND(arg1, arg2, arg3):
+		#Code
+	def ORR(arg1, arg2, arg3):
+		#Code
+	def EOR(arg1, arg2, arg3):
+		#Code
+	def LDUR(arg1, arg2, mem):
+		#Code
+	def SDUR(arg1, arg2, mem):
+		#Code
+	def CBZ(arg1, offset):
+		#Code
+	def CBNZ(arg1, offset):
+		#Code
+	def MOVZ(arg1, val, shift):
+		#Code
+	def MOVK(arg1, val, shift):
+		#Code
+	def B(arg1):
+		#Code
+	def NOP():
+		#Code
+##################################################################################
 #   Dissemble Class
 #       Contains an instance of a text input of binary code, with each row in the
 #       lists being an iteration of an instruction.  opt2 was not included in
