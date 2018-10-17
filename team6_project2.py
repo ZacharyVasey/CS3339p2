@@ -4,17 +4,19 @@
 ##################################################################################
 class Simulator:
 	def ADD(arg1, arg2, arg3):
-		#Code
+		arg1 = arg2 + arg3
 	def ADDI(arg1, arg2, imm):
-		#Code
+		arg1 = arg2 + imm
 	def SUB(arg1, arg2, arg3):
-		#Code
+		arg1 = arg2 - arg3
 	def SUBI(arg1, arg2, imm):
-		#Code
+		arg1 = arg2 - imm
 	def LSL(arg1, arg2, shift):
-		#Code
+		arg1 = arg2 * (2 ** shift)
+		#can shift be negative?6
 	def LSR(arg1, arg2, shift):
-		#Code
+		arg1 = arg2 / (2 ** shift)
+		#can shift be negative?
 	def AND(arg1, arg2, arg3):
 		#Code
 	def ORR(arg1, arg2, arg3):
