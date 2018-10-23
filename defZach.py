@@ -151,73 +151,15 @@ def sub_one_from_bin(number = []):
 			index = -1
 		index = index - 1
 ####################################################################
-##################################################################################
-#   Simulator Class
-#       Runs assembley code
-##################################################################################
-class Simulator:
-	def ADD(self, arg1, arg2, arg3):
-		arg1 = arg2 + arg3
-	def ADDI(self, arg1, arg2, imm):
-		arg1 = arg2 + imm
-	def SUB(self, arg1, arg2, arg3):
-		arg1 = arg2 - arg3
-	def SUBI(self, arg1, arg2, imm):
-		arg1 = arg2 - imm
-	def LSL(self, arg1, arg2, shift):
-		arg1 = arg2 * (2 ** shift)
-		#can shift be negative?
-	def LSR(self, arg1, arg2, shift):
-		arg1 = arg2 / (2 ** shift)
-		#can shift be negative?
-	def AND(self, arg1, arg2, arg3):
-		arg1 = arg2& arg3
-	def ORR(self, arg1, arg2, arg3):
-		arg1 = arg2 | arg3
-	def EOR(self, arg1, arg2, arg3):
-		arg1 = arg2 ^ arg3
-	def LDUR(self, arg1, arg2, mem):
-		#Code
-		print hello
-	def SDUR(self, arg1, arg2, mem):
-		#Code
-		print hello
-	def CBZ(self, arg1, offset, pc):
-		if(arg1 == 0):
-			pc = pc + offset
-	def CBNZ(self, arg1, offset, pc):
-		if(arg1 != 0):
-			pc = pc + offset
-	def MOVZ(self, arg1, val, shift): 
-		#move with zero MOVZ R1, 255, LSL 48
-		print hello
-	def MOVK(self, arg1, val, shift):
-		print hello
-	def B(self, arg1, pc):
-		pc = pc + arg1
-	def NOP():
-		#Code
-		print "hello"
-##############################################
-def main():
-	a = Simulator()
-	b = 15
-	c = 20
-	d = 40
-	a.ADD(b, c, d)
-	print c, " + ", d, " = ", b
-	a.ADDI(b, c, d)
-	print c, " + ", d, " = ", b
-	a.SUB(b, c, d)
-	print c, " - ", d, " = ", b
-	a.SUBI(b, c, d)
-	print c, " - ", d, " = ", b
-	a.AND(b, c, d)
-	print c, " and ", d, " = ", b
-	a.ORR(b, c, d)
-	print c, " or ", d, " = ", b
-	a.EOR(b, c, d)
-	print c, " xor ", d, " = ", b
+print "54 in binary is 110110: ", dec_to_unsbin(54)
+print "-54 in signed binary is 11111111111111111111111111001010: ", dec_to_sinbin32(-54)
+print "54 in signed binary is 00000000000000000000000000110110: ", dec_to_sinbin32(54)
+print "1 in binary is 1: ", dec_to_unsbin(1)
+print "-1 in signed binary is 11111111111111111111111111111111: ", dec_to_sinbin32(-1)
+print "1 in signed binary is 00000000000000000000000000000001: ", dec_to_sinbin32(1)
 
-if __name__ == "__main__":
-	main()
+print "54 or 0000000000110110 is: ", sinbin_to_dec("0000000000110110")
+print "-106 or 1111111110010110 is: ", sinbin_to_dec("1111111110010110")
+
+print "0 or 0000000000000000 is: ", sinbin_to_dec("0000000000000000")
+print "-1 or 1111111111111111 is: ", sinbin_to_dec("1111111111111111")
