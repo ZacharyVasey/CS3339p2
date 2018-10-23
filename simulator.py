@@ -166,79 +166,58 @@ class Simulator:
 		arg1 = arg2 - imm
 	def LSL(self, arg1, arg2, shift):
 		arg1 = arg2 * (2 ** shift)
-		#can shift be negative?6
+		#can shift be negative?
 	def LSR(self, arg1, arg2, shift):
 		arg1 = arg2 / (2 ** shift)
 		#can shift be negative?
 	def AND(self, arg1, arg2, arg3):
-		arg2bin = dec_to_sinbin32(arg2)
-		arg3bin = dec_to_sinbin32(arg3)
-		#TESTPRINT
-		print arg2bin
-		print arg3bin
-		arg1bin = []
-		count = 0
-		while(count < len(arg2bin)):
-			if(arg2bin[count] == "1" and arg3bin[count] == "1"):
-				arg1bin.append("1")
-			else:
-				arg1bin.append("0")
-			count = count + 1
-		arg1 = sinbin_to_dec(arg1bin)
-		print arg1
-		print arg1bin
+		arg1 = arg2& arg3
 	def ORR(self, arg1, arg2, arg3):
-		arg2bin = dec_to_sinbin32(arg2)
-		arg3bin = dec_to_sinbin32(arg3)
-		#TESTPRINT
-		print arg2bin
-		print arg3bin
-		arg1bin = []
-		count = 0
-		while(count < len(arg2bin)):
-			if(arg2bin[count] == "1" or arg3bin[count] == "1"):
-				arg1bin.append("1")
-			else:
-				arg1bin.append("0")
-			count = count + 1
-		arg1 = sinbin_to_dec(arg1bin)
-		print arg1
-		print arg1bin
+		arg1 = arg2 | arg3
 	def EOR(self, arg1, arg2, arg3):
-		#Code
-		print hello
+		arg1 = arg2 ^ arg3
 	def LDUR(self, arg1, arg2, mem):
 		#Code
 		print hello
 	def SDUR(self, arg1, arg2, mem):
 		#Code
 		print hello
-	def CBZ(self, arg1, offset):
-		#Code
-		print hello
-	def CBNZ(self, arg1, offset):
-		#Code
-		print hello
-	def MOVZ(self, arg1, val, shift):
-		#Code
+	def CBZ(self, arg1, offset, pc):
+		if(arg1 == 0):
+			pc = pc + offset
+	def CBNZ(self, arg1, offset, pc):
+		if(arg1 != 0):
+			pc = pc + offset
+	def MOVZ(self, arg1, val, shift): 
+		#move with zero MOVZ R1, 255, LSL 48
 		print hello
 	def MOVK(self, arg1, val, shift):
-		#Code
 		print hello
-	def B(self, arg1):
-		#Code
-		print hello
+	def B(self, arg1, pc):
+		pc = pc + arg1
 	def NOP():
 		#Code
-		print hello
+		print "hello"
 ##############################################
 def main():
 	a = Simulator()
 	b = 15
 	c = 20
-	a.ADD(b, c, 10)
-	a.AND(b, 10, 15)
-	a.ORR(b, 10, 15)
+	d = 40
+	a.ADD(b, c, d)
+	print c, " + ", d, " = ", b
+	a.ADDI(b, c, d)
+	print c, " + ", d, " = ", b
+	a.SUB(b, c, d)
+	print c, " - ", d, " = ", b
+	a.SUBI(b, c, d)
+	print c, " - ", d, " = ", b
+	a.AND(b, c, d)
+	print c, " and ", d, " = ", b
+	a.ORR(b, c, d)
+	print c, " or ", d, " = ", b
+	a.EOR(b, c, d)
+	print c, " xor ", d, " = ", b
 
 if __name__ == "__main__":
 	main()
