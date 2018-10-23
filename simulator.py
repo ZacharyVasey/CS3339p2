@@ -170,6 +170,8 @@ class Simulator:
 	def LSR(self, arg1, arg2, shift):
 		arg1 = arg2 / (2 ** shift)
 		#can shift be negative?
+	def ASR(self, arg1, arg2, shift):
+		print hello
 	def AND(self, arg1, arg2, arg3):
 		arg1 = arg2& arg3
 	def ORR(self, arg1, arg2, arg3):
@@ -190,7 +192,7 @@ class Simulator:
 			pc = pc + offset
 	def MOVZ(self, arg1, val, shift): 
 		#move with zero MOVZ R1, 255, LSL 48
-		print hello
+		arg1 = val * (16 * shift)
 	def MOVK(self, arg1, val, shift):
 		print hello
 	def B(self, arg1, pc):
