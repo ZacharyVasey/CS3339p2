@@ -421,13 +421,10 @@ class Dissemble(object):
 			elif (binData.insType[k] == "NOP"):
 				line += str(binData.opCodeStr[k])
 			binData.litInstr.append(line)
-			startLine += line + '\n'
+			startLine += line
 			binData.finalText += startLine + '\n'
 		# print lines
 		print binData.finalText
-		for line in binData.litInstr:
-			print line
-		
 
 	##################################################################################
 	#   writeOut:  writes final product to text file.
