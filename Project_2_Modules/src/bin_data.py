@@ -3,7 +3,6 @@
 ##################################################################################
 class BinData(object):
 	def __init__(self):
-		self.mySring = 'BinData object created'
 		# FILE DATA
 		self.inFile = ''     # Holds name of input file (via command line).
 		self.outFile = ''     # Holds name of output file (via command line).
@@ -37,3 +36,4 @@ class BinData(object):
 		self.addrNum = []       # Holds numeric address in instruction.
 		self.shiftNum = []      # Holds shift in instruction.
 		self.memLines = []      # Holds memory address of each line.
+		self.litInstr = []      # Holds literal instructions or literal data (human readable).
