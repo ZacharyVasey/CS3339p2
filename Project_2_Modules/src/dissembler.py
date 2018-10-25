@@ -371,17 +371,17 @@ class Dissemble(object):
 		k = 0
 		for k in range(k, binData.numLinesText):
 			# Pull single line of binary data, spaced.
+			startLine = ''
 			line = ''
 			if (binData.isInstr[k] == True):
 				# Memory address.
-				line += binData.instrSpaced[k]
+				startLine += binData.instrSpaced[k]
 			else:
-				line += binData.machineLines[k]
-			line = line + '\t' + str(binData.memLines[k])
-
-			# Print R formats
+				startLine += binData.machineLines[k]
+			startLine += '\t' + str(binData.memLines[k]) + '\t'
+			
 			if (binData.insType[k] == 'R'):
-				line = line + '\t' + binData.opCodeStr[k]
+				line = line + binData.opCodeStr[k]
 				if(binData.shamNum[k] == ''):
 					line = line + '\t' + 'R' + str(binData.rdRtRegNum[k]) + ', '
 				else:
@@ -393,36 +393,42 @@ class Dissemble(object):
 				else:
 					line = line + ' ' + '#' + str(binData.shamNum[k])
 			elif (binData.insType[k] == 'I'):
-				line = line + '\t' + binData.opCodeStr[k]
+				line += binData.opCodeStr[k]
 				line = line + '\t' + 'R' + str(binData.rdRtRegNum[k]) + ','
 				line += ' R' + str(binData.rnRegNum[k]) + ','
 				line += ' #' + str(binData.immNum[k])
 			elif (binData.insType[k] == 'D'):
-				line += '\t' + binData.opCodeStr[k]
+				line += binData.opCodeStr[k]
 				line += '\t' + 'R' + str(binData.rdRtRegNum[k]) + ','
 				line += ' ' + '[R' + str(binData.rnRegNum[k]) +', #'
 				line += str(binData.addrNum[k]) + ']'
 			elif (binData.insType[k] == "CB"):
-				line += '\t' + binData.opCodeStr[k]
+				line += binData.opCodeStr[k]
 				line += '\t' + 'R' + str(binData.rdRtRegNum[k]) + ','
 				line += ' ' + '#' + str(binData.addrNum[k])
 			elif (binData.insType[k] == "B"):
-				line += '\t' + binData.opCodeStr[k]
+				line += binData.opCodeStr[k]
 				line += '\t' + "#" + str(binData.addrNum[k])
 			elif (binData.insType[k] == "IM"):
-				line += '\t' + binData.opCodeStr[k]
+				line += binData.opCodeStr[k]
 				line += '\t' + "R" + str(binData.rdRtRegNum[k]) +','
 				line += ' ' + str(binData.immNum[k]) + ','
 				line += ' ' + "LSL " + str(binData.shiftNum[k])
 			elif (binData.insType[k] == 'BREAK'):
-				line += '\t' + binData.opCodeStr[k]
+				line += binData.opCodeStr[k]
 			elif (binData.insType[k] == 'DATA'):
-				line += '\t' + str(binData.data[k])
+				line += str(binData.data[k])
 			elif (binData.insType[k] == "NOP"):
-				line += '\t' + str(binData.opCodeStr[k])
-			binData.finalText += line + '\n'
-			# print line
+				line += str(binData.opCodeStr[k])
+			binData.litInstr.append(line)
+			startLine += line + '\n'
+			binData.finalText += startLine + '\n'
+		# print lines
 		print binData.finalText
+		for line in binData.litInstr:
+			print line
+		
+
 	##################################################################################
 	#   writeOut:  writes final product to text file.
 	##################################################################################
