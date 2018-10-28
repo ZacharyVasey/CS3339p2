@@ -155,71 +155,111 @@ def sub_one_from_bin(number = []):
 #   Simulator Class
 #       Runs assembley code
 ##################################################################################
+regState = [0] * 32
+BIT_MASK_0 = 0xFFFFFFFFFFFF0000
+BIT_MASK_1 = 0xFFFFFFFF0000FFFF
+BIT_MASK_2 = 0xFFFF0000FFFFFFFF
+BIT_MASK_3 = 0x0000FFFFFFFFFFFF
 class Simulator:
+	#self.regState = [0] * 32
+	#self.BIT_MASK_0 = 0xFFFFFF00
+	#self.BIT_MASK_1 = 0xFFFF00FF
+	#self.BIT_MASK_2 = 0xFF00FFFF
+	#self.BIT_MASK_3 = 0x00FFFFFF
 	def ADD(self, arg1, arg2, arg3):
-		arg1 = arg2 + arg3
+		regState[arg1] = regState[arg2] + regState[arg3]
 	def ADDI(self, arg1, arg2, imm):
-		arg1 = arg2 + imm
+		regState[arg1] = regState[arg2] + imm
 	def SUB(self, arg1, arg2, arg3):
-		arg1 = arg2 - arg3
+		regState[arg1] = regState[arg2] - regState[arg3]
 	def SUBI(self, arg1, arg2, imm):
-		arg1 = arg2 - imm
+		regState[arg1] = regState[arg2] - imm
 	def LSL(self, arg1, arg2, shift):
-		arg1 = arg2 * (2 ** shift)
+		regState[arg1] = (regState[arg2] % (1 << 64)) << shift
 		#can shift be negative?
 	def LSR(self, arg1, arg2, shift):
-		arg1 = arg2 / (2 ** shift)
-		#can shift be negative?
+		regState[arg1] = (regState[arg2] % (1 << 64)) >> shift
 	def ASR(self, arg1, arg2, shift):
-		print hello
+		regState[arg1] = regState[arg2] >> shift
 	def AND(self, arg1, arg2, arg3):
-		arg1 = arg2& arg3
+		regState[arg1] = regState[arg2]& regState[arg3]
 	def ORR(self, arg1, arg2, arg3):
-		arg1 = arg2 | arg3
+		regState[arg1] = regState[arg2] | regState[arg3]
 	def EOR(self, arg1, arg2, arg3):
-		arg1 = arg2 ^ arg3
+		regState[arg1] = regState[arg2] ^ regState[arg3]
 	def LDUR(self, arg1, arg2, mem):
-		#Code
-		print hello
+		regState[arg1] = regState[arg2[mem]]
+		#?????
 	def SDUR(self, arg1, arg2, mem):
-		#Code
-		print hello
+		regState[arg2[mem]] = regState[arg1]
 	def CBZ(self, arg1, offset, pc):
-		if(arg1 == 0):
+		if(regState[arg1] == 0):
 			pc = pc + offset
 	def CBNZ(self, arg1, offset, pc):
-		if(arg1 != 0):
+		if(regState[arg1] != 0):
 			pc = pc + offset
 	def MOVZ(self, arg1, val, shift): 
+<<<<<<< HEAD
 		#move with zero MOVZ R1, 255, LSL 48
 		arg1 = val * (16 * shift)
+=======
+		regState[arg1] = 0
+		val = val * (2 ** (16 * shift))
+		regState[arg1] = regState[arg1] + val
+>>>>>>> 06de3e52eeeeda3c170e365f9ceeeed22f744470
 	def MOVK(self, arg1, val, shift):
-		print hello
-	def B(self, arg1, pc):
-		pc = pc + arg1
+		if(shift == 0):
+			regState[arg1] = regState[arg1] & BIT_MASK_0
+		elif(shift == 1):
+			regState[arg1] = regState[arg1] & BIT_MASK_1
+		elif(shift == 2):
+			regState[arg1] = regState[arg1] & BIT_MASK_2
+		else:
+			regState[arg1] = regState[arg1] & BIT_MASK_3
+		val = val * (2 ** (16 * shift))
+		regState[arg1] = regState[arg1] + val
+	def B(self, offset, pc):
+		pc = pc + offset
 	def NOP():
 		#Code
 		print "hello"
 ##############################################
 def main():
 	a = Simulator()
-	b = 15
-	c = 20
-	d = 40
+	b = 1
+	c = 2
+	d = 3
+	regState[b] = 10
+	regState[c] = 20
+	regState[d] = 30
+	
+	
 	a.ADD(b, c, d)
-	print c, " + ", d, " = ", b
-	a.ADDI(b, c, d)
-	print c, " + ", d, " = ", b
+	print regState[c], " + ", regState[d], " = ", regState[b]
+	a.ADDI(b, c, 10)
+	print regState[c], " + ", 10, " = ", regState[b]
 	a.SUB(b, c, d)
-	print c, " - ", d, " = ", b
-	a.SUBI(b, c, d)
-	print c, " - ", d, " = ", b
+	print regState[c], " - ", regState[d], " = ", regState[b]
+	a.SUBI(b, c, 10)
+	print regState[c], " - ", 10, " = ", regState[b]
 	a.AND(b, c, d)
-	print c, " and ", d, " = ", b
+	print regState[c], " and ", regState[d], " = ", regState[b]
 	a.ORR(b, c, d)
-	print c, " or ", d, " = ", b
+	print regState[c], " or ", regState[d], " = ", regState[b]
 	a.EOR(b, c, d)
-	print c, " xor ", d, " = ", b
+	print regState[c], " xor ", regState[d], " = ", regState[b]
+	regState[b] = (2 ** 30) - 1
+	a.MOVK(b, 255, 3)
+	print "255 movz 2 = ", regState[b], " or ", bin(regState[b])
+	regState[b] = (2 ** 30) - 1
+	a.MOVZ(b, 255, 3)
+	print "255 movz 2 = ", regState[b], " or ", bin(regState[b])
+	regState[b] = (2 ** 30) - 1
+	a.MOVK(b, 63, 0)
+	print "63 movz 0 = ", regState[b], " or ", bin(regState[b])
+	regState[b] = (2 ** 30) - 1
+	a.MOVZ(b, 63, 0)
+	print "63 movz 0 = ", regState[b], " or ", bin(regState[b])
 
 if __name__ == "__main__":
 	main()
