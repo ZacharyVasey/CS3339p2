@@ -39,7 +39,7 @@ class Simulator (object):
 	###############################################################################
 	# FUNCTIONS
 	def run(self):
-		print ">>>>>>>>>>> INSIDE SIMULATOR.run(): YOU WILL BE SIMULATED >>>>>>>>>>>>>>>>> "  # TESTPRINT
+		print "\n>>>>>>>>>>> INSIDE SIMULATOR.run(): YOU WILL BE SIMULATED >>>>>>>>>>>>>>>>> "  # TESTPRINT
 		
 		for x, ins in enumerate(self.insType):
 			
@@ -50,42 +50,84 @@ class Simulator (object):
 			else:   # If there is a previous cycle with register states...
 				self.nextCyc = copy.deepcopy(self.cycles[x-1])  # Make copy of that, with NEW instance.
 				self.nextCyc.PC += 4    # Increment PC to next instruction.
-		
+			
+			# R-Format Instruction
+			if self.opCodeStr[x] == 'ADD':
+				pass
+			elif self.opCodeStr[x] == 'SUB':
+				pass
+			elif self.opCodeStr[x] == 'LSL':
+				pass
+			elif self.opCodeStr[x] == 'LSR':
+				pass
+			elif self.opCodeStr[x] == 'AND':
+				pass
+			elif self.opCodeStr[x] == 'ORR':
+				pass
+			elif self.opCodeStr[x] == 'EOR':
+				pass
+			elif self.opCodeStr[x] == 'ASR':
+				pass
 			# I-Format Instructions
-			if self.opCodeStr[x] == 'ADDI':
+			elif self.opCodeStr[x] == 'ADDI':
 				# print 'Cycle ' + str(x + 1) + ':   ' + self.litInstr[x]  # TESTPRINT
-
 				# Get immediate value.
 				self.immVal = self.immNum[x]
 				# print 'imm: ' + str(self.immVal)  # TESTPRINT
-				
 				# Get dest register number and value.
 				self.rd = self.rdRtRegNum[x]
 				# print 'rd: ' + str(self.rd)  # TESTPRINT
 				# print 'rdVal: ' + str(self.nextCyc.regState[self.rd])  # TESTPRINT
-				
 				# Get src register value.
 				self.rn = self.rnRegNum[x]
-				print 'rn: ' + str(self.rn)  # TESTPRINT
+				# print 'rn: ' + str(self.rn)  # TESTPRINT
 				self.rnVal = self.nextCyc.regState[self.rn]
-				print 'rnVal: ' + str(self.nextCyc.regState[self.rn])    # TESTPRINT
-				
+				# print 'rnVal: ' + str(self.nextCyc.regState[self.rn])    # TESTPRINT
 				# Do the math:  rd = rn + imm
 				# There's a lot going on here:  The current cycle (nextCyc) has 32 register files: regState[].
 				# We want a specific dest register, IDed by rdRtRegNum[x]:  self.nextCyc.regState[self.rdRtRegNum[x]]
 				# One of the operands is currently stored in the register file.  We get that specific src register the
 				# same way.  In nextCyc, we need a specific register of the 32, IDed by rnRegNum[].
 				# Finally, we have the easy immediate: NOT in a register file, but in immNum[].
-				self.nextCyc.regState[self.rdRtRegNum[x]] = self.nextCyc.regState[self.rnRegNum[x]] + self.immNum[x]
-					
+				self.nextCyc.regState[self.rd] = self.rnVal + self.immVal
 				# TESTPRINT
 				# print 'nextCyc.regState[self.rd]: ' + str(self.nextCyc.regState[self.rd])
-				
+				pass
+			elif self.opCodeStr[x] == 'SUBI':
+				pass
+			# D-Format Instruction
+			elif self.opCodeStr[x] == 'LDUR':
+				pass
+			elif self.opCodeStr[x] == 'SDUR':
+				pass
+			# CB-Format
+			elif self.opCodeStr[x] == 'CBZ':
+				pass
+			elif self.opCodeStr[x] == 'CBNZ':
+				pass
+			# IM-Format
+			elif self.opCodeStr[x] == 'MOVZ':
+				pass
+			elif self.opCodeStr[x] == 'MOVK':
+				pass
+			# B-Format
+			elif self.opCodeStr[x] == 'B':
+				pass
+			# Non-Ins-Format
+			elif self.opCodeStr[x] == 'NOP':
+				pass
+			elif self.opCodeStr[x] == 'DATA':
+				pass
+				print 'Error: you reached DATA in Simulator().run.  You should have reached BREAK first.'
+			elif self.opCodeStr[x] == '':
+				pass
+			else:
+				print "You should not be here."
 			self.cycles.append(self.nextCyc)    # Slap latest cycle to the list.
 			
 		# TEST RUN() DOWN HERE
 		self.printCycles()
-		print ">>>>>>>>>>> EXITING SIMULATOR.run(): YOU HAVE BEEN SIMULATED >>>>>>>>>>>>>>>>> "  # TESTPRINT
+		print ">>>>>>>>>>> EXITING SIMULATOR.run(): YOU HAVE BEEN SIMULATED >>>>>>>>>>>>>>>>> \n\n"  # TESTPRINT
 	def printCycle(self, clockCycle):
 		'Takes an element in the cycle Register and prints it.'
 		print
