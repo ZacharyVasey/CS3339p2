@@ -156,10 +156,10 @@ def sub_one_from_bin(number = []):
 #       Runs assembley code
 ##################################################################################
 regState = [0] * 32
-BIT_MASK_0 = 0xFFFFFF00
-BIT_MASK_1 = 0xFFFF00FF
-BIT_MASK_2 = 0xFF00FFFF
-BIT_MASK_3 = 0x00FFFFFF
+BIT_MASK_0 = 0xFFFFFFFFFFFF0000
+BIT_MASK_1 = 0xFFFFFFFF0000FFFF
+BIT_MASK_2 = 0xFFFF0000FFFFFFFF
+BIT_MASK_3 = 0x0000FFFFFFFFFFFF
 class Simulator:
 	#self.regState = [0] * 32
 	#self.BIT_MASK_0 = 0xFFFFFF00
@@ -242,12 +242,18 @@ def main():
 	print regState[c], " or ", regState[d], " = ", regState[b]
 	a.EOR(b, c, d)
 	print regState[c], " xor ", regState[d], " = ", regState[b]
-	regState[b] = (2 ** 26) - 1
-	a.MOVK(b, 256, 2)
-	print regState[c], " movk ", regState[d], " = ", regState[b]
-	regState[b] = (2 ** 26) - 1
-	a.MOVZ(b, 256, 2)
-	print regState[c], " movz ", regState[d], " = ", regState[b]
+	regState[b] = (2 ** 30) - 1
+	a.MOVK(b, 255, 3)
+	print "255 movz 2 = ", regState[b], " or ", bin(regState[b])
+	regState[b] = (2 ** 30) - 1
+	a.MOVZ(b, 255, 3)
+	print "255 movz 2 = ", regState[b], " or ", bin(regState[b])
+	regState[b] = (2 ** 30) - 1
+	a.MOVK(b, 63, 0)
+	print "63 movz 0 = ", regState[b], " or ", bin(regState[b])
+	regState[b] = (2 ** 30) - 1
+	a.MOVZ(b, 63, 0)
+	print "63 movz 0 = ", regState[b], " or ", bin(regState[b])
 
 if __name__ == "__main__":
 	main()
