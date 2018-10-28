@@ -199,14 +199,11 @@ class Simulator:
 		if(regState[arg1] != 0):
 			pc = pc + offset
 	def MOVZ(self, arg1, val, shift): 
-<<<<<<< HEAD
 		#move with zero MOVZ R1, 255, LSL 48
 		arg1 = val * (16 * shift)
-=======
 		regState[arg1] = 0
 		val = val * (2 ** (16 * shift))
 		regState[arg1] = regState[arg1] + val
->>>>>>> 06de3e52eeeeda3c170e365f9ceeeed22f744470
 	def MOVK(self, arg1, val, shift):
 		if(shift == 0):
 			regState[arg1] = regState[arg1] & BIT_MASK_0
