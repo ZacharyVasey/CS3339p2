@@ -40,7 +40,7 @@ class Dissemble(object):
 			elvBin = line[0:11]
 			elvDec = int(elvBin, 2)
 			# TESTPRINT
-			# print elvBin + '  -  '  + str(elvDec)
+			print elvBin + '  -  '  + str(elvDec)
 			if (elvDec >= 160 and elvDec <= 191):
 				binData.isInstr.append(True)
 				binData.opCodeStr.append("B")
