@@ -40,7 +40,7 @@ class Dissemble(object):
 			elvBin = line[0:11]
 			elvDec = int(elvBin, 2)
 			# TESTPRINT
-			print elvBin + '  -  '  + str(elvDec)
+			# print elvBin + '  -  '  + str(elvDec)
 			if (elvDec >= 160 and elvDec <= 191):
 				binData.isInstr.append(True)
 				binData.opCodeStr.append("B")
@@ -170,6 +170,7 @@ class Dissemble(object):
 			tempBin = int(line, base=2)
 			# Get Rm
 			rmNum = ((tempBin & binData.rmMask) >> 16)
+			# Get sham
 			# Get sham
 			shamNum = ((tempBin & binData.shamMask) >> 10)
 			# Get Rn
@@ -382,11 +383,12 @@ class Dissemble(object):
 			
 			if (binData.insType[k] == 'R'):
 				line = line + binData.opCodeStr[k]
-				if(binData.shamNum[k] == ''):
-					line = line + '\t' + 'R' + str(binData.rdRtRegNum[k]) + ', '
-				else:
-					line = line + '\t' + 'R' + str(binData.rmRegNum[k]) + ', '
-				line = line + ' ' + 'R' + str(binData.rnRegNum[k]) + ','
+				# if(binData.shamNum[k] == ''):       # If this is NOT an LSR or LSL...
+				# 	line = line + '\t' + 'R' + str(binData.rdRtRegNum[k]) + ', '
+				# else:
+				# 	line = line + '\t' + 'R' + str(binData.rmRegNum[k]) + ', '
+				line = line + '\t' + 'R' + str(binData.rdRtRegNum[k]) + ', '    # Print dest register.
+				line = line + ' ' + 'R' + str(binData.rnRegNum[k]) + ','    # print src register.
 				# Does this R-format use shift?
 				if (binData.shamNum[k] == ''):
 					line = line + ' ' + 'R' + str(binData.rmRegNum[k])

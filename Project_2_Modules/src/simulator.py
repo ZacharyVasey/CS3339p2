@@ -5,7 +5,7 @@ import copy
 class Simulator (object):
 	
 	def __init__(self, opCodeStr, isInstr, insType, data, rmRegNum, shamNum, rnRegNum, rdRtRegNum, immNum,
-	             addrNum, shiftNum, litInstr):
+	             addrNum, shiftNum, litInstr, memLines):
 		# Set up cycle sequence list.
 		self.cycles = [] # Holds list of cycles, each with state data.  Each CC results in new cycle.
 		# Set up BinData column copies.
@@ -21,17 +21,60 @@ class Simulator (object):
 		self.addrNum = addrNum
 		self.shiftNum = shiftNum
 		self.litInstr = litInstr
+		self.memLines = memLines
 	###############################################################################
 	#   Class Cycle:  a single cycle, and the register/data states at that time.
 	###############################################################################
 	# NESTED CLASS
 	class Cycle(object):
 		def __init__(self):
-			self.ID = 0  # TESTPRINT: not sure we need this???
 			self.PC = 96    # Assumed starting point.
-			self.litIns = ''    # TESTPRINT:  Not sure we need this either???
 			self.regState = [0] * 32
 			self.datState = []
+	###############################################################################
+	###############################################################################
+	def testOpCodeStr(self, opStr):
+		if opStr == 'ADD':
+			pass
+		elif opStr == 'SUB':
+			pass
+		elif opStr == 'LSL':
+			pass
+		elif opStr == 'LSR':
+			pass
+		elif opStr == 'AND':
+			pass
+		elif opStr == 'ORR':
+			pass
+		elif opStr == 'EOR':
+			pass
+		elif opStr == 'ADDI':
+			pass
+		elif opStr == 'SUBI':
+			pass
+		elif opStr == 'LDUR':
+			pass
+		elif opStr == 'STUR':
+			pass
+		elif opStr == 'CBNZ':
+			pass
+		elif opStr == 'MOVK':
+			pass
+		elif opStr == 'MOVZ':
+			pass
+		elif opStr == 'B':
+			pass
+		elif opStr == 'NOP':
+			pass
+		elif opStr == 'DATA':
+			pass
+		elif opStr == 'BREAK':
+			pass
+		else:
+			pass
+		
+		
+	
 	###############################################################################
 	#   run:  operates the simulator, which processes each instruction, one cycle
 	#   at a time.  Makes copy of old cycle[i - 1], modifies that copy, and then
@@ -41,6 +84,7 @@ class Simulator (object):
 	def run(self):
 		print "\n>>>>>>>>>>> INSIDE SIMULATOR.run(): YOU WILL BE SIMULATED >>>>>>>>>>>>>>>>> "  # TESTPRINT
 		
+		
 		for x, ins in enumerate(self.insType):
 			
 			if ins == 'BREAK':
@@ -49,28 +93,97 @@ class Simulator (object):
 				self.nextCyc = self.Cycle() # Create EMPTY cycle.
 			else:   # If there is a previous cycle with register states...
 				self.nextCyc = copy.deepcopy(self.cycles[x-1])  # Make copy of that, with NEW instance.
-				self.nextCyc.PC += 4    # Increment PC to next instruction.
+			# print '\tCurrent register value at r10: ' + str(self.nextCyc.regState[10])  # TESTPRINT
+			# print '\tIn binary: ' + str(bin(self.nextCyc.regState[10]))     # TESTPRINT
 			
 			# R-Format Instruction
 			if self.opCodeStr[x] == 'ADD':
-				self.nextCyc.regState[self.rdRtRegNum[x]] = self.nextCyc.regState[self.rnRegNum[x]] + \
-				                                            self.nextCyc.regState[self.rmRegNum[x]]
-				# self.nextCyc.regState[self.rd] = self.rnRegNum[x] + self.rmRegNum[x]
+				self.nextCyc.PC += 4  # Increment PC to next instruction.
+				# print 'Testing ADD'             #TESTPRINT
+				self.rd = self.rdRtRegNum[x]    # Get dest register number.
+				# print '\trd:', self.rd          #TESTPRINT
+				self.rn = self.rnRegNum[x]      # Get op1 register number.
+				# print '\trn:', self.rn          #TESTPRINT
+				self.rnVal = self.nextCyc.regState[self.rn]     # Get op1 value.
+				# print '\trnVal:', self.rnVal    #TESTPRINT
+				self.rm = self.rmRegNum[x]      # Get op2 register number.
+				# print '\trm:', self.rm          #TESTPRINT
+				self.rmVal = self.nextCyc.regState[self.rm]     # Get op2 value.
+				# print '\trmVal:', self.rmVal    #TESTPRINT
+				self.rdVal = self.rnVal + self.rmVal  # Get value to save to register.
+				# print '\trdVal:', self.rdVal    #TESTPRINT
+				self.nextCyc.regState[self.rd] = self.rdVal
 			elif self.opCodeStr[x] == 'SUB':
-				self.nextCyc.regState[self.rdRtRegNum[x]] = self.nextCyc.regState[self.rnRegNum[x]] - \
-				                                 self.nextCyc.regState[self.rmRegNum[x]]
-			# elif self.opCodeStr[x] == 'LSL':
-			# 	self.nextCyc.regState[self.rd] = (self.rnRegNum[x] % (1 << 64)) << self.shamNum[x]
-			# elif self.opCodeStr[x] == 'LSR':
-			# 	self.nextCyc.regState[self.rd] = (self.rnRegNum[x] % (1 << 64)) >> self.shamNum[x]
-			# elif self.opCodeStr[x] == 'AND':
-			# 	self.nextCyc.regState[self.rd] = self.rnRegNum[x] & self.rmRegNum[x]
-			# elif self.opCodeStr[x] == 'ORR':
-			# 	self.nextCyc.regState[self.rd] = self.rnRegNum[x] | self.rmRegNum[x]
-			# elif self.opCodeStr[x] == 'EOR':
-			# 	self.nextCyc.regState[self.rd] = self.rnRegNum[x] ^ self.rmRegNum[x]
-			# elif self.opCodeStr[x] == 'ASR':
-			# 	self.nextCyc.regState[self.rd] = self.rnRegNum[x]  >> self.shamNum[x]
+				self.nextCyc.PC += 4  # Increment PC to next instruction.
+				self.rd = self.rdRtRegNum[x]    # Get dest register number.
+				self.rn = self.rnRegNum[x]      # Get op1 register number.
+				self.rnVal = self.nextCyc.regState[self.rn]     # Get op1 value.
+				self.rm = self.rmRegNum[x]      # Get op2 register number.
+				self.rmVal = self.nextCyc.regState[self.rm]     # Get op2 value.
+				self.rdVal = self.rnVal - self.rmVal  # Get value to save to register.
+				self.nextCyc.regState[self.rd] = self.rdVal
+			elif self.opCodeStr[x] == 'LSL':
+				self.nextCyc.PC += 4  # Increment PC to next instruction.
+				# print 'Testing LSL...'          #TESTPRINT
+				self.rd = self.rdRtRegNum[x]    # Get dest register number.
+				# print '\trd:', self.rd          #TESTPRINT
+				self.rn = self.rnRegNum[x]      # Get src register number.
+				# print '\trn:', self.rn          #TESTPRINT
+				self.rnVal = self.nextCyc.regState[self.rn]      # Get src value.
+				# print '\trnVal:', self.rnVal    #TESTPRINT
+				self.shiftVal = self.shamNum[x]     # Get shift amount.
+				# print '\tshiftVal:', self.shiftVal  #TESTPRINT
+				self.rdVal = self.rnVal << self.shiftVal
+				# print '\trdVal:', self.rdVal        #TESTPRINT
+				self.nextCyc.regState[self.rd] = self.rdVal
+			elif self.opCodeStr[x] == 'LSR':
+				self.nextCyc.PC += 4  # Increment PC to next instruction.
+				self.rd = self.rdRtRegNum[x]    # Get dest register number.
+				self.rn = self.rnRegNum[x]      # Get src register number.
+				self.rnVal = self.nextCyc.regState[self.rn]      # Get src value.
+				self.shiftVal = self.shamNum[x]     # Get shift amount.
+				self.rdVal = self.rnVal >> self.shiftVal
+				self.nextCyc.regState[self.rd] = self.rdVal
+			elif self.opCodeStr[x] == 'AND':
+				self.nextCyc.PC += 4  # Increment PC to next instruction.
+				# print 'Testing AND...'              # TESTPRINT
+				self.rd = self.rdRtRegNum[x]
+				self.rdVal = self.nextCyc.regState[self.rd]
+				# print '\trd:', self.rd              # TESTPRINT
+				# print '\trdVal:', self.rdVal        # TESTPRINT
+				self.rn = self.rnRegNum[x]
+				# print '\trn:', self.rn              # TESTPRINT
+				self.rnVal = self.nextCyc.regState[self.rn]
+				# print '\trnVal:', bin(self.rnVal)   # TESTPRINT
+				self.rm = self.rmRegNum[x]
+				# print '\trm:', self.rm              # TESTPRINT
+				self.rmVal = self.nextCyc.regState[self.rm]
+				# print '\trmVal:', bin(self.rmVal)        # TESTPRINT
+				self.thisNum = self.rmVal & self.rnVal
+				# print '\trdVal:', self.thisNum      # TESTPRINT
+				self.nextCyc.regState[self.rd] = self.thisNum
+			elif self.opCodeStr[x] == 'ORR':
+				self.nextCyc.PC += 4  # Increment PC to next instruction.
+				self.rd = self.rdRtRegNum[x]
+				self.rdVal = self.nextCyc.regState[self.rd]
+				self.rn = self.rnRegNum[x]
+				self.rnVal = self.nextCyc.regState[self.rn]
+				self.rm = self.rmRegNum[x]
+				self.rmVal = self.nextCyc.regState[self.rm]
+				self.thisNum = self.rmVal | self.rnVal
+				self.nextCyc.regState[self.rd] = self.thisNum
+			elif self.opCodeStr[x] == 'EOR':
+				self.nextCyc.PC += 4  # Increment PC to next instruction.
+				self.rd = self.rdRtRegNum[x]
+				self.rdVal = self.nextCyc.regState[self.rd]
+				self.rn = self.rnRegNum[x]
+				self.rnVal = self.nextCyc.regState[self.rn]
+				self.rm = self.rmRegNum[x]
+				self.rmVal = self.nextCyc.regState[self.rm]
+				self.thisNum = self.rmVal ^ self.rnVal
+				self.nextCyc.regState[self.rd] = self.thisNum
+			elif self.opCodeStr[x] == 'ASR':  ##############################################################
+				pass
 			# I-Format Instructions
 			elif self.opCodeStr[x] == 'ADDI':
 				# print 'Cycle ' + str(x + 1) + ':   ' + self.litInstr[x]  # TESTPRINT
@@ -97,6 +210,7 @@ class Simulator (object):
 				# print 'nextCyc.regState[self.rd]: ' + str(self.nextCyc.regState[self.rd])
 				pass
 			elif self.opCodeStr[x] == 'SUBI':
+				self.nextCyc.PC += 4  # Increment PC to next instruction.
 				self.immVal = self.immNum[x]
 				# print 'imm: ' + str(self.immVal)  # TESTPRINT
 				self.rd = self.rdRtRegNum[x]
@@ -106,43 +220,39 @@ class Simulator (object):
 				# print 'rn: ' + str(self.rn)  # TESTPRINT
 				self.rnVal = self.nextCyc.regState[self.rn]
 				self.nextCyc.regState[self.rd] = self.rnVal - self.immVal
-			# # D-Format Instruction
-			# elif self.opCodeStr[x] == 'LDUR':
-			# 	self.nextCyc.regState[self.rdRtRegNum[x]] = self.rnRegNum[x] + self.addrNum[x]
-			# elif self.opCodeStr[x] == 'STUR':
-			# 	pass
-			# # CB-Format
-			# elif self.opCodeStr[x] == 'CBZ':
-			# 	if(self.rdRtRegNum[x] == 0):
-			# 		self.nextCyc.PC = self.addrNum[x]
-			# elif self.opCodeStr[x] == 'CBNZ':
-			# 	if (self.rdRtRegNum[x] != 0):
-			# 		self.nextCyc.PC = self.addrNum[x]
-			# # IM-Format
-			# elif self.opCodeStr[x] == 'MOVZ':
-			# 	self.nextCyc.regState[self.rdRtRegNum[x]] = self.immNum[x] ** (16 * self.shiftNum[x])
-			# elif self.opCodeStr[x] == 'MOVK':
-			# 	MASK_BIT_0 = 0xFFFFFFFFFFFF0000
-			# 	MASK_BIT_1 = 0xFFFFFFFF0000FFFF
-			# 	MASK_BIT_2 = 0xFFFF0000FFFFFFFF
-			# 	MASK_BIT_3 = 0x0000FFFFFFFFFFFF
-			# 	if(self.shiftNum[x] == 0):
-			# 		self.nextCyc.regState[self.rdRtRegNum[x]] = self.nextCyc.regState[self.rdRtRegNum[x]] & MASK_BIT_0
-			# 	elif(self.shiftNum[x] == 1):
-			# 		self.nextCyc.regState[self.rdRtRegNum[x]] = self.nextCyc.regState[self.rdRtRegNum[x]] & MASK_BIT_1
-			# 	elif (self.shiftNum[x] == 2):
-			# 		self.nextCyc.regState[self.rdRtRegNum[x]] = self.nextCyc.regState[self.rdRtRegNum[x]] & MASK_BIT_2
-			# 	else:
-			# 		self.nextCyc.regState[self.rdRtRegNum[x]] = self.nextCyc.regState[self.rdRtRegNum[x]] & MASK_BIT_3
-			# 	self.nextCyc.regState[self.rdRtRegNum[x]] = self.nextCyc.regState[self.rdRtRegNum[x]] + (2 ** (16 * self.shiftNum[x]))
-			#
+			# D-Format Instruction
+			elif self.opCodeStr[x] == 'LDUR':   ##############################################################
+				pass
+			elif self.opCodeStr[x] == 'STUR':   ##############################################################
+				pass
+			# CB-Format
+			elif self.opCodeStr[x] == 'CBZ':
+				pass
+				
+			elif self.opCodeStr[x] == 'CBNZ':
+				print 'Testing CBNZ...'
+				print '\tpc:', self.nextCyc.PC
+				rd = self.rdRtRegNum[x]
+				print '\trd:', rd
+				self.rdVal = self.nextCyc.regState[self.rd]
+				print '\trdVal:', self.rdVal
+				addr = self.addrNum[x]
+				print '\taddr:', addr
+				addr *= 4
+				print '\taddr *= 4:', addr
+
+			# IM-Format
+			elif self.opCodeStr[x] == 'MOVZ':   ##############################################################
+				pass
+			elif self.opCodeStr[x] == 'MOVK':   ##############################################################
+				pass
 			# B-Format
-			elif self.opCodeStr[x] == 'B':
-				self.nextCyc.PC = self.addrNum[x]   #????
-			# # Non-Ins-Format
-			# elif self.opCodeStr[x] == 'NOP':
-			# 	pass
-			elif self.opCodeStr[x] == 'DATA':
+			elif self.opCodeStr[x] == 'B':      ##############################################################
+				pass
+			# MISC
+			elif self.opCodeStr[x] == 'NOP':
+				pass
+			elif self.opCodeStr[x] == 'DATA':   ##############################################################
 				print 'Error: you reached DATA in Simulator().run.  You should have reached BREAK first.'
 			elif self.opCodeStr[x] == '':
 				pass
