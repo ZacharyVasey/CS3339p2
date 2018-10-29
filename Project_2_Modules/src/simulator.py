@@ -53,21 +53,22 @@ class Simulator (object):
 			
 			# R-Format Instruction
 			if self.opCodeStr[x] == 'ADD':
-				pass
+				self.nextCyc.regState[self.rd] = self.nextCyc.regState[self.rnRegNum[x]] + self.nextCyc.regState[self.rmRegNum[x]]
+				self.nextCyc.regState[self.rd] = self.rnRegNum[x] + self.rmRegNum[x]
 			elif self.opCodeStr[x] == 'SUB':
-				pass
+				self.nextCyc.regState[self.rd] = self.nextCyc.regState[self.rnRegNum[x]] - self.nextCyc.regState[self.rmRegNum[x]]
 			elif self.opCodeStr[x] == 'LSL':
-				pass
+				self.nextCyc.regState[self.rd] = (self.rnRegNum[x] % (1 << 64)) << self.shamNum[x]
 			elif self.opCodeStr[x] == 'LSR':
-				pass
+				self.nextCyc.regState[self.rd] = (self.rnRegNum[x] % (1 << 64)) >> self.shamNum[x]
 			elif self.opCodeStr[x] == 'AND':
-				pass
+				self.nextCyc.regState[self.rd] = self.rnRegNum[x] & self.rmRegNum[x]
 			elif self.opCodeStr[x] == 'ORR':
-				pass
+				self.nextCyc.regState[self.rd] = self.rnRegNum[x] | self.rmRegNum[x]
 			elif self.opCodeStr[x] == 'EOR':
-				pass
+				self.nextCyc.regState[self.rd] = self.rnRegNum[x] ^ self.rmRegNum[x]
 			elif self.opCodeStr[x] == 'ASR':
-				pass
+				self.nextCyc.regState[self.rd] = self.rnRegNum[x]  >> self.shamNum[x]
 			# I-Format Instructions
 			elif self.opCodeStr[x] == 'ADDI':
 				# print 'Cycle ' + str(x + 1) + ':   ' + self.litInstr[x]  # TESTPRINT
@@ -94,30 +95,52 @@ class Simulator (object):
 				# print 'nextCyc.regState[self.rd]: ' + str(self.nextCyc.regState[self.rd])
 				pass
 			elif self.opCodeStr[x] == 'SUBI':
-				pass
+				self.immVal = self.immNum[x]
+				# print 'imm: ' + str(self.immVal)  # TESTPRINT
+				self.rd = self.rdRtRegNum[x]
+				# print 'rd: ' + str(self.rd)  # TESTPRINT
+				# print 'rdVal: ' + str(self.nextCyc.regState[self.rd])  # TESTPRINT
+				self.rn = self.rnRegNum[x]
+				# print 'rn: ' + str(self.rn)  # TESTPRINT
+				self.rnVal = self.nextCyc.regState[self.rn]
+				self.nextCyc.regState[self.rd] = self.rnVal - self.immVal
 			# D-Format Instruction
 			elif self.opCodeStr[x] == 'LDUR':
-				pass
+				self.nextCyc.regState[self.rdRtRegNum[x]] = self.rnRegNum[x] + self.addrNum[x]
 			elif self.opCodeStr[x] == 'SDUR':
 				pass
 			# CB-Format
 			elif self.opCodeStr[x] == 'CBZ':
-				pass
+				if(self.rdRtRegNum[x] == 0):
+					self.nextCyc.PC = self.addrNum[x]
 			elif self.opCodeStr[x] == 'CBNZ':
-				pass
+				if (self.rdRtRegNum[x] != 0):
+					self.nextCyc.PC = self.addrNum[x]
 			# IM-Format
 			elif self.opCodeStr[x] == 'MOVZ':
-				pass
+				self.nextCyc.regState[self.rdRtRegNum[x]] = self.immNum[x] ** (16 * self.shiftNum[x])
 			elif self.opCodeStr[x] == 'MOVK':
-				pass
+				MASK_BIT_0 = 0xFFFFFFFFFFFF0000
+				MASK_BIT_1 = 0xFFFFFFFF0000FFFF
+				MASK_BIT_2 = 0xFFFF0000FFFFFFFF
+				MASK_BIT_3 = 0x0000FFFFFFFFFFFF
+				if(self.shiftNum[x] == 0):
+					self.nextCyc.regState[self.rdRtRegNum[x]] = self.nextCyc.regState[self.rdRtRegNum[x]] & MASK_BIT_0
+				elif(self.shiftNum[x] == 1):
+					self.nextCyc.regState[self.rdRtRegNum[x]] = self.nextCyc.regState[self.rdRtRegNum[x]] & MASK_BIT_1
+				elif (self.shiftNum[x] == 2):
+					self.nextCyc.regState[self.rdRtRegNum[x]] = self.nextCyc.regState[self.rdRtRegNum[x]] & MASK_BIT_2
+				else:
+					self.nextCyc.regState[self.rdRtRegNum[x]] = self.nextCyc.regState[self.rdRtRegNum[x]] & MASK_BIT_3
+				self.nextCyc.regState[self.rdRtRegNum[x]] = self.nextCyc.regState[self.rdRtRegNum[x]] + (2 ** (16 * self.shiftNum[x]))
+				
 			# B-Format
 			elif self.opCodeStr[x] == 'B':
-				pass
+				self.nextCyc.PC = self.addrNum[x]   #????
 			# Non-Ins-Format
 			elif self.opCodeStr[x] == 'NOP':
 				pass
 			elif self.opCodeStr[x] == 'DATA':
-				pass
 				print 'Error: you reached DATA in Simulator().run.  You should have reached BREAK first.'
 			elif self.opCodeStr[x] == '':
 				pass
