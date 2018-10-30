@@ -111,6 +111,11 @@ class Dissemble(object):
 				binData.opCodeStr.append("LSL")
 				binData.insType.append("R")
 				binData.data.append('')
+			elif (elvDec == 1692):
+				binData.isInstr.append(True)
+				binData.opCodeStr.append("ASR")
+				binData.insType.append("R")
+				binData.data.append('')
 			elif (elvDec == 1984):
 				binData.isInstr.append(True)
 				binData.opCodeStr.append("STUR")
