@@ -30,6 +30,7 @@ class Simulator (object):
 	class Cycle(object):
 		def __init__(self):
 			self.PC = 0
+			self.litIns = ''
 			self.regState = [0] * 32
 			self.datState = []
 	###############################################################################
@@ -51,6 +52,7 @@ class Simulator (object):
 		self.rdVal = self.rnVal + self.rmVal  # Get value to save to register.
 		# print '\trdVal:', self.rdVal    #TESTPRINT
 		nc.regState[self.rd] = self.rdVal
+		nc.litIns = self.litInstr[x]
 	###############################################################################
 	###############################################################################
 	def doSUB(self, nc, x):
@@ -62,6 +64,7 @@ class Simulator (object):
 		self.rmVal = self.nextCyc.regState[self.rm]  # Get op2 value.
 		self.rdVal = self.rnVal - self.rmVal  # Get value to save to register.
 		nc.regState[self.rd] = self.rdVal
+		nc.litIns = self.litInstr[x]
 	###############################################################################
 	###############################################################################
 	def doLSL(self, nc, x):
@@ -78,6 +81,7 @@ class Simulator (object):
 		self.rdVal = self.rnVal << self.shiftVal
 		# print '\trdVal:', self.rdVal        #TESTPRINT
 		nc.regState[self.rd] = self.rdVal
+		nc.litIns = self.litInstr[x]
 	###############################################################################
 	###############################################################################
 	def doLSR(self, nc, x):
@@ -88,6 +92,7 @@ class Simulator (object):
 		self.shiftVal = self.shamNum[x]  # Get shift amount.
 		self.rdVal = self.rnVal >> self.shiftVal
 		nc.regState[self.rd] = self.rdVal
+		nc.litIns = self.litInstr[x]
 	###############################################################################
 	###############################################################################
 	def doAND(self, nc, x):
@@ -108,6 +113,7 @@ class Simulator (object):
 		self.thisNum = self.rmVal & self.rnVal
 		# print '\trdVal:', self.thisNum      # TESTPRINT
 		nc.regState[self.rd] = self.thisNum
+		nc.litIns = self.litInstr[x]
 	###############################################################################
 	###############################################################################
 	def doORR(self, nc, x):
@@ -120,6 +126,7 @@ class Simulator (object):
 		self.rmVal = self.nextCyc.regState[self.rm]
 		self.thisNum = self.rmVal | self.rnVal
 		nc.regState[self.rd] = self.thisNum
+		nc.litIns = self.litInstr[x]
 	###############################################################################
 	###############################################################################
 	def doEOR(self, nc, x):
@@ -132,6 +139,7 @@ class Simulator (object):
 		self.rmVal = self.nextCyc.regState[self.rm]
 		self.thisNum = self.rmVal ^ self.rnVal
 		nc.regState[self.rd] = self.thisNum
+		nc.litIns = self.litInstr[x]
 	###############################################################################
 	###############################################################################
 	def doASR(self, nc, x):
@@ -164,6 +172,7 @@ class Simulator (object):
 		nc.regState[self.rd] = self.rnVal + self.immVal
 		# print '\t\tnc.PC:', nc.PC   # TESTPRINT
 		# print '\t\tself.nextCyc.PC:', self.nextCyc.PC       # TESTPRINT
+		nc.litIns = self.litInstr[x]
 	###############################################################################
 	###############################################################################
 	def doSUBI(self, nc, x):
@@ -177,6 +186,7 @@ class Simulator (object):
 		# print 'rn: ' + str(self.rn)  # TESTPRINT
 		self.rnVal = self.nextCyc.regState[self.rn]
 		nc.regState[self.rd] = self.rnVal - self.immVal
+		nc.litIns = self.litInstr[x]
 	###############################################################################
 	###############################################################################
 	def doCBNZ(self, nc, x):
@@ -184,6 +194,7 @@ class Simulator (object):
 		rd = self.rdRtRegNum[x]
 		rdVal = nc.regState[rd]
 		addr = self.addrNum[x]
+		nc.litIns = self.litInstr[x]
 		# print 'Testing CBNZ...'
 		# print '\tpc:', nc.PC
 		# print '\trd:', rd
@@ -199,62 +210,10 @@ class Simulator (object):
 	###############################################################################
 	def doNOP(self, nc, x):
 		nc.PC = self.memLines[x]  # Increment PC to CURRENT instruction.
+		nc.litIns = self.litInstr[x]
 	# TESTPRINT
 	# print 'nextCyc.regState[self.rd]: ' + str(self.nextCyc.regState[self.rd])
-	###############################################################################
-	###############################################################################
-	# def procIns(self, nc, ops, x):
-	# 	# ######################################### R
-	# 	if ops == 'ADD':
-	# 		self.doADD(nc, x)
-	# 	elif ops == 'SUB':
-	# 		self.doSUB(nc, x)
-	# 	elif ops == 'LSL':
-	# 		self.doLSL(nc, x)
-	# 	elif ops == 'LSR':
-	# 		self.doLSR(nc, x)
-	# 	elif ops == 'AND':
-	# 		self.doAND(nc, x)
-	# 	elif ops == 'ORR':
-	# 		self.doORR(nc, x)
-	# 	elif ops == 'EOR':
-	# 		self.doEOR(nc, x)
-	# 	elif ops == 'ASR':
-	# 		pass
-	# 	######################################### I
-	# 	elif ops == 'ADDI':
-	# 		self.doADDI(nc, x)
-	# 		# self.doADDI(self.nextCyc, x)
-	# 	elif ops == 'SUBI':
-	# 		self.doSUBI(nc, x)
-	# 	######################################### D
-	# 	elif ops == 'LDUR':
-	# 		pass
-	# 	elif ops == 'STUR':
-	# 		pass
-	# 	######################################### CB
-	# 	elif ops == 'CBZ':
-	# 		pass
-	# 	elif ops == 'CBNZ':
-	# 		rd = self.rdRtRegNum[x]
-	# 		rdVal = nc.regState[rd]
-	# 		addr = self.addrNum[x]
-	# 		# print 'Inside CBNZ...'
-	# 		# print '\trd:', rd
-	# 		# print '\trdVal:', rdVal
-	# 		# print '\taddr:', addr
-	#
-	# 	######################################### IM
-	# 	elif ops == 'MOVZ':
-	# 		pass
-	# 	elif ops == 'MOVK':
-	# 		pass
-	# 	######################################### B
-	# 	elif ops == 'B':
-	# 		pass
-	# 	elif ops == 'NOP':
-	# 		self.doNOP(nc, x)
-	
+
 			
 	###############################################################################
 	#   run:  operates the simulator, which processes each instruction, one cycle
@@ -271,15 +230,52 @@ class Simulator (object):
 		while (self.x < self.numLinesText):
 			print 'In while loop...', self.x, ' ... ', self.litInstr[self.x], ' ... ', self.memLines[self.x]
 			self.nextCyc = copy.deepcopy(self.nextCyc)
-			if self.opCodeStr[self.x] == 'ADDI':
+			######################################## R
+			if self.opCodeStr[self.x] == 'ADD':
+				self.doADD(self.nextCyc, self.x)
+				self.cycles.append(self.nextCyc)
+			elif self.opCodeStr[self.x] == 'SUB':
+				self.doSUB(self.nextCyc, self.x)
+				self.cycles.append(self.nextCyc)
+			elif self.opCodeStr[self.x] == 'LSL':
+				self.doLSL(self.nextCyc, self.x)
+				self.cycles.append(self.nextCyc)
+			elif self.opCodeStr[self.x] == 'LSR':
+				self.doLSR(self.nextCyc, self.x)
+				self.cycles.append(self.nextCyc)
+			elif self.opCodeStr[self.x] == 'AND':
+				self.doAND(self.nextCyc, self.x)
+				self.cycles.append(self.nextCyc)
+			elif self.opCodeStr[self.x] == 'ORR':
+				self.doORR(self.nextCyc, self.x)
+				self.cycles.append(self.nextCyc)
+			elif self.opCodeStr[self.x] == 'EOR':
+				self.doEOR(self.nextCyc, self.x)
+				self.cycles.append(self.nextCyc)
+			elif self.opCodeStr[self.x] == 'ASR':
+				self.doASR(self.nextCyc, self.x)
+				self.cycles.append(self.nextCyc)
+			######################################## D
+			elif self.opCodeStr[self.x] == 'LDUR':
+				self.doLDUR(self.nextCyc, self.x)
+				self.cycles.append(self.nextCyc)
+			elif self.opCodeStr[self.x] == 'STUR':
+				self.cycles.append(self.nextCyc)
+			######################################## I
+			elif self.opCodeStr[self.x] == 'ADDI':
 				self.doADDI(self.nextCyc, self.x)
 				self.cycles.append(self.nextCyc)
 			elif self.opCodeStr[self.x] == 'SUBI':
 				self.doSUBI(self.nextCyc, self.x)
 				self.cycles.append(self.nextCyc)
-			elif self.opCodeStr[self.x] == 'NOP':
-				self.doNOP(self.nextCyc, self.x)
+			######################################## IM
+			elif self.opCodeStr[self.x] == 'MOVK':
+				self.doMOVK(self.nextCyc, self.x)
 				self.cycles.append(self.nextCyc)
+			elif self.opCodeStr[self.x] == 'MOVZ':
+				self.doMOVZ(self.nextCyc, self.x)
+				self.cycles.append(self.nextCyc)
+			######################################## CB
 			elif self.opCodeStr[self.x] == 'CBNZ':
 				y = self.doCBNZ(self.nextCyc, self.x)
 				self.cycles.append(self.nextCyc)
@@ -289,84 +285,23 @@ class Simulator (object):
 				if y != 0:
 					self.x += y
 					continue
-					
+				else:
+					print 'y == 0'
+			elif self.opCodeStr[self.x] == 'CBZ':
+				pass
+
+			elif self.opCodeStr[self.x] == 'NOP':
+				self.doNOP(self.nextCyc, self.x)
+				self.cycles.append(self.nextCyc)
 			self.x += 1
 			
-			print 'Testing cycles:'
-			for cyc in self.cycles:
-				print cyc.PC
+		# print 'Testing cycles:'
+		# for cyc in self.cycles:
+		# 	print cyc.PC
+		# print 'Testing opCodeStr:'
+		# for op in self.opCodeStr:
+		# 	print op
 			
-			
-		
-		
-		
-		
-		
-		
-		
-		
-		
-		# self.x = 0      #  Start instruction index at 0.
-		# while (self.x < self.numLinesText):     # Shouldn't reach end of file, but worst case scenario.
-		# 	print 'Testing while loop...', self.x, ' ... ', self.opCodeStr[self.x]    # TESTPRINT
-		# 	self.nextCyc = copy.deepcopy(self.nextCyc)  # Make copy of that, with NEW instance.
-		# 	print 'Testing current cyc:'
-		#
-		# 	if self.insType[self.x] == 'BREAK':
-		# 		break
-		# 	# ######################################### R
-		# 	elif self.opCodeStr[self.x] in ['ADD', 'SUB', 'LSL', 'LSR', 'AND', 'ORR', 'EOR', 'ASR']:
-		# 		self.procIns(self.nextCyc, self.opCodeStr[self.x], self.x)
-		# 	######################################### I
-		# 	elif self.opCodeStr[self.x] in ['ADDI', 'SUBI']:
-		# 		self.procIns(self.nextCyc, self.opCodeStr[self.x], self.x)
-		# 	######################################### D
-		# 	elif self.opCodeStr[self.x] in ['LDUR', 'STUR']:
-		# 		self.procIns(self.nextCyc, self.opCodeStr[self.x], self.x)
-		# 	######################################### CB
-		# 	elif self.opCodeStr[self.x] in ['CBZ', 'CBNZ']:
-		# 		self.procIns(self.nextCyc, self.opCodeStr[self.x], self.x)
-		# 		print 'Inside run()... testing CBNZ'
-		# 		rd = self.rdRtRegNum[self.x]
-		# 		rdVal = self.nextCyc.regState[rd]
-		# 		ofs = self.addrNum[self.x]
-		# 		y = self.x
-		# 		print '\trd:', rd
-		# 		print '\trdVal:', rdVal
-		# 		print '\ty = x:', y
-		# 		print '\toffset:', ofs
-		# 		y += ofs
-		# 		print '\ty += ofs:', y
-		# 		# if rdVal != 0:
-		# 		# 	x += ofs
-		# 		if rdVal != 0:
-		# 			self.x = y
-		# 			self.cycles.append(self.nextCyc)
-		# 			break
-		#
-		# 	######################################### IM
-		# 	elif self.opCodeStr[self.x] in ['MOVZ','MOVK']:
-		# 		self.procIns(self.nextCyc, self.opCodeStr[self.x], self.x)
-		# 	######################################### B
-		# 	elif self.opCodeStr[self.x] == 'B':
-		# 		self.procIns(self.nextCyc, self.opCodeStr[self.x], self.x)
-		# 	######################################### MISC
-		# 	elif self.opCodeStr[self.x] == 'NOP':
-		# 		self.procIns(self.nextCyc, self.opCodeStr[self.x], self.x)
-		# 	elif self.opCodeStr[self.x] == 'DATA':
-		# 		print 'Error: you reached DATA in Simulator().run.  You should have reached BREAK first.'
-		# 	elif self.opCodeStr[self.x] == '':
-		# 		pass
-		# 	else:
-		# 		print "You should not be here."
-		# 	self.cycles.append(self.nextCyc)    # Slap latest cycle to the list.
-		# 	self.x += 1
-
-
-
-
-
-
 			
 		# TEST RUN() DOWN HERE
 		self.printCycles()
@@ -375,7 +310,8 @@ class Simulator (object):
 		'Takes an element in the cycle Register and prints it.'
 		print
 		print '======================================================================='
-		print 'Cycle ' + str(clockCycle + 1) + ':  ' + str(self.cycles[clockCycle].PC) + self.opCodeStr[clockCycle-1]
+		print 'Cycle ' + str(clockCycle + 1) + ':  ' + str(self.cycles[clockCycle].PC) + \
+		      '\t\t' + self.cycles[clockCycle].litIns
 		print '\nRegisters:'
 		z = 0
 		for x in range(0, 4):   # Prints all registers 4 rows x 8 columns
