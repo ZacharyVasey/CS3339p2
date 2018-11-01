@@ -714,22 +714,22 @@ class Simulator(object):
 	###############################################################################
 	###############################################################################
 	def doLDUR(self, nc, x):
-		print 'INSIDE LDUR...'
+		# print 'INSIDE LDUR...'
 		nc.PC = self.memLines[x]  # Increment PC to CURRENT instruction.
 		rn = self.rnRegNum[x]  # Base Address in Register
-		print '\trn:', rn
+		# print '\trn:', rn
 		rnVal = nc.regState[rn]  # Base Address
-		print '\trnVal:', rnVal
+		# print '\trnVal:', rnVal
 		addr = self.addrNum[x]  # Offset
-		print '\taddr:', addr
+		# print '\taddr:', addr
 		dataIndex = ((nc.datStart - rnVal + addr) / 4)  # Fancy doings.
-		print '\t(datStart - rnVal):', (nc.datStart - rnVal)
-		print '\tdatStart:', nc.datStart
-		print '\t'
-		print '\tdataIndex:', dataIndex
+		# print '\t(datStart - rnVal):', (nc.datStart - rnVal)
+		# print '\tdatStart:', nc.datStart
+		# print '\t'
+		# print '\tdataIndex:', dataIndex
 		
 		load = nc.datState[dataIndex]
-		print '\tload:', load
+		# print '\tload:', load
 		rd = self.rdRtRegNum[x]
 		nc.regState[rd] = load
 		
@@ -841,13 +841,17 @@ class Simulator(object):
 		nc.PC = self.memLines[x]
 		nc.litIns = self.litInstr[x]
 	
+	def writeOut(self, binData):
+		outFile = open(binData.outFile, 'w')
+		outFile.write(binData.finalText)
+		outFile.close()
 	###############################################################################
 	#   run:  operates the simulator, which processes each instruction, one cycle
 	#   at a time.  Makes copy of old cycle[i - 1], modifies that copy, and then
 	#   saves it to the list of cycles.
 	###############################################################################
 	# FUNCTIONS
-	def run(self):
+	def run(self, binData):
 		print "\n>>>>>>>>>>> INSIDE SIMULATOR.run(): YOU WILL BE SIMULATED >>>>>>>>>>>>>>>>> "  # TESTPRINT
 		self.nextCyc = self.Cycle()  # Create first EMPTY cycle (empty regState[]).  Not appended to cycles[].
 		
@@ -956,26 +960,31 @@ class Simulator(object):
 			self.x += 1
 		
 		# TEST RUN() DOWN HERE
-		self.printCycles()
+		self.printCycles(binData)
 		print "\n>>>>>>>>>>> EXITING SIMULATOR.run(): YOU HAVE BEEN SIMULATED >>>>>>>>>>>>>>>>> \n"  # TESPRINT
 	
-	def printCycle(self, clockCycle):
+	def printCycle(self, clockCycle, binData):
 		'Takes an element in the cycle Register and prints it.'
 		print
 		print '======================================================================='
+		binData.finalText += '=======================================================================' + "\n"
 		print 'Cycle ' + str(clockCycle + 1) + ':  ' + str(self.cycles[clockCycle].PC) + \
 		      '\t\t' + self.cycles[clockCycle].litIns
+		binData.finalText += 'Cycle ' + str(clockCycle + 1) + ':  ' + str(self.cycles[clockCycle].PC) + '\t\t' + self.cycles[clockCycle].litIns + "\n"
 		print '\nRegisters:'
+		binData.finalText += '\nRegisters:' + "\n"
 		z = 0
 		for x in range(0, 4):  # Prints all registers 4 rows x 8 columns
 			line = 'r' + str(z).zfill(2) + ':\t'
 			for y in range(0, 8):
 				line += str(self.cycles[clockCycle].regState[y + z]) + '\t'
 			print line
+			binData.finalText +=  line + "\n"
 			z += 8
 		
 		outLine = ''
-		print '\nData:'
+		print '\nData:' 
+		binData.finalText += '\nData:' + "\n"
 		datStart = self.cycles[0].datStart
 		header = str(datStart) + ':\t'
 		y = 0
@@ -985,10 +994,13 @@ class Simulator(object):
 				header += '\n' + str(datStart + (y * 32)) + ':\t'
 			header += str(d) + '\t'
 		print header
+		binData.finalText += header + "\n"
 	
-	def printCycles(self):
+	def printCycles(self, binData):
+		binData.finalText = ''
 		for x, cycle in enumerate(self.cycles):
-			self.printCycle(x)
+			self.printCycle(x, binData)
+		self.writeOut(binData)
 
 import sys, getopt
 def main():
@@ -1002,10 +1014,17 @@ def main():
 	# Initialize objects
 	diss = Dissemble()
 	diss.run(binData)
+	print binData.outFile
+	for i in range(len(sys.argv)):
+		if (sys.argv[i] == '-i' and i < (len(sys.argv) - 1)):
+			binData.inFile = sys.argv[i+1]
+		elif (sys.argv[i] == '-o' and i < (len(sys.argv) - 1)):
+			binData.outFile = sys.argv[i+1] + '_sim.txt'
+	print binData.outFile
 	sim = Simulator(binData.opCodeStr, binData.isInstr, binData.insType, binData.data, binData.rmRegNum,
 	                binData.shamNum, binData.rnRegNum, binData.rdRtRegNum, binData.immNum, binData.addrNum,
 	                binData.shiftNum, binData.litInstr, binData.memLines, binData.numLinesText)
-	sim.run()
+	sim.run(binData)
 if __name__== "__main__":
 	main()
 
