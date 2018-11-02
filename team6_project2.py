@@ -852,7 +852,7 @@ class Simulator(object):
 	###############################################################################
 	# FUNCTIONS
 	def run(self, binData):
-		print "\n>>>>>>>>>>> INSIDE SIMULATOR.run(): YOU WILL BE SIMULATED >>>>>>>>>>>>>>>>> "  # TESTPRINT
+		#print "\n>>>>>>>>>>> INSIDE SIMULATOR.run(): YOU WILL BE SIMULATED >>>>>>>>>>>>>>>>> "  # TESTPRINT
 		self.nextCyc = self.Cycle()  # Create first EMPTY cycle (empty regState[]).  Not appended to cycles[].
 		
 		# Grab memory start address.
@@ -961,7 +961,7 @@ class Simulator(object):
 		
 		# TEST RUN() DOWN HERE
 		self.printCycles(binData)
-		print "\n>>>>>>>>>>> EXITING SIMULATOR.run(): YOU HAVE BEEN SIMULATED >>>>>>>>>>>>>>>>> \n"  # TESPRINT
+		#print "\n>>>>>>>>>>> EXITING SIMULATOR.run(): YOU HAVE BEEN SIMULATED >>>>>>>>>>>>>>>>> \n"  # TESPRINT
 	
 	def printCycle(self, clockCycle, binData):
 		'Takes an element in the cycle Register and prints it.'
@@ -1014,13 +1014,15 @@ def main():
 	# Initialize objects
 	diss = Dissemble()
 	diss.run(binData)
-	print binData.outFile
+	#TESPRINT
+	#print binData.outFile
 	for i in range(len(sys.argv)):
 		if (sys.argv[i] == '-i' and i < (len(sys.argv) - 1)):
 			binData.inFile = sys.argv[i+1]
 		elif (sys.argv[i] == '-o' and i < (len(sys.argv) - 1)):
 			binData.outFile = sys.argv[i+1] + '_sim.txt'
-	print binData.outFile
+	#TESPRINT
+	#print binData.outFile
 	sim = Simulator(binData.opCodeStr, binData.isInstr, binData.insType, binData.data, binData.rmRegNum,
 	                binData.shamNum, binData.rnRegNum, binData.rdRtRegNum, binData.immNum, binData.addrNum,
 	                binData.shiftNum, binData.litInstr, binData.memLines, binData.numLinesText)
