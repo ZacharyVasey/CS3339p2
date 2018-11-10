@@ -535,7 +535,7 @@ class Simulator(object):
 			self.PC = 0
 			self.litIns = ''
 			self.regState = [0] * 32
-			self.datState = []
+			self.datState = [0] * 14
 			self.datStart = 0
 	
 	###############################################################################
@@ -746,7 +746,10 @@ class Simulator(object):
 		rnVal = nc.regState[rn]  # base addr
 		addr = self.addrNum[x]  # offset
 		dataIndex = ((nc.datStart - rnVal + addr) / 4)  # Fancy doings.
-		
+		#TESPRINT
+		print "dataIndex: ", dataIndex
+		print "Size of nc.datState[]", len(nc.datState)
+		print "nc.datState[dataIndex]: ", nc.datState[dataIndex]
 		nc.datState[dataIndex] = rdVal
 		nc.litIns = self.litInstr[x]
 	
@@ -797,7 +800,7 @@ class Simulator(object):
 			nc.regState[rd] = nc.regState[rd] & BIT_MASK_3
 		# TESPRINT
 		# print "shift num: ", self.shiftNum[x]
-		nc.regState[rd] = self.immNum[x] * (2 ** self.shiftNum[x])
+		nc.regState[rd] = nc.regState[rd] + (self.immNum[x] * (2 ** self.shiftNum[x]))
 	
 	###############################################################################
 	###############################################################################
@@ -852,7 +855,7 @@ class Simulator(object):
 	###############################################################################
 	# FUNCTIONS
 	def run(self, binData):
-		#print "\n>>>>>>>>>>> INSIDE SIMULATOR.run(): YOU WILL BE SIMULATED >>>>>>>>>>>>>>>>> "  # TESTPRINT
+		print "\n>>>>>>>>>>> INSIDE SIMULATOR.run(): YOU WILL BE SIMULATED >>>>>>>>>>>>>>>>> "  # TESTPRINT
 		self.nextCyc = self.Cycle()  # Create first EMPTY cycle (empty regState[]).  Not appended to cycles[].
 		
 		# Grab memory start address.
@@ -860,19 +863,19 @@ class Simulator(object):
 			if self.insType[y] == 'DATA':
 				self.nextCyc.datStart = self.memLines[y]
 				break
-		# print 'datStart:', self.nextCyc.datStart        # TESTPRINT
+		print 'datStart:', self.nextCyc.datStart        # TESTPRINT
 		# Load memory data in first iteration of cycles.  (Only data load, until later instructions.)
 		for y, ins in enumerate(self.opCodeStr):
 			if self.insType[y] == 'DATA':
 				self.nextCyc.datState.append(self.data[y])
-		# print 'nextCyc.datState[]...' #TESTPRINT
+		print 'nextCyc.datState[]...' #TESTPRINT
 		# for x in self.nextCyc.datState:
 		# 	print x
 		
 		# Load cycles[]
 		self.x = 0
 		while (self.x < self.numLinesText):
-			# print 'In while loop...', self.x, ' ... ', self.litInstr[self.x], ' ... ', self.memLines[self.x]
+			print 'In while loop...', self.x, ' ... ', self.litInstr[self.x], ' ... ', self.memLines[self.x]
 			self.nextCyc = copy.deepcopy(self.nextCyc)
 			######################################## R
 			if self.opCodeStr[self.x] == 'ADD':
@@ -947,7 +950,7 @@ class Simulator(object):
 			elif self.opCodeStr[self.x] == 'B':
 				y = self.doB(self.nextCyc, self.x)
 				self.cycles.append(self.nextCyc)
-				self.x = y
+				self.x += y
 				continue
 			######################################## MISC
 			elif self.opCodeStr[self.x] == 'NOP':
