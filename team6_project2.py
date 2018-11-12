@@ -535,7 +535,7 @@ class Simulator(object):
 			self.PC = 0
 			self.litIns = ''
 			self.regState = [0] * 32
-			self.datState = [0] * 14
+			self.datState = []
 			self.datStart = 0
 	
 	###############################################################################
@@ -728,12 +728,23 @@ class Simulator(object):
 		# print '\t'
 		# print '\tdataIndex:', dataIndex
 		
-		load = nc.datState[dataIndex]
-		# print '\tload:', load
-		rd = self.rdRtRegNum[x]
-		nc.regState[rd] = load
-		
-		nc.litIns = self.litInstr[x]
+		testBound = dataIndex > len(nc.datState) - 1
+		if not testBound:
+			load = nc.datState[dataIndex]
+			# print '\tload:', load
+			rd = self.rdRtRegNum[x]
+			nc.regState[rd] = load
+			nc.litIns = self.litInstr[x]
+		else:
+			popNum = dataIndex - len(nc.datState)
+			for x in range(0, popNum):
+				nc.datState.append(0)
+			load = nc.datState[dataIndex]
+			# print '\tload:', load
+			rd = self.rdRtRegNum[x]
+			nc.regState[rd] = load
+			nc.litIns = self.litInstr[x]
+			
 	
 	###############################################################################
 	###############################################################################
@@ -741,18 +752,37 @@ class Simulator(object):
 		nc.PC = self.memLines[x]  # Increment PC to CURRENT instruction.
 		rd = self.rdRtRegNum[x]  # src register
 		rdVal = nc.regState[rd]  # store
-		
 		rn = self.rnRegNum[x]  # base reg
 		rnVal = nc.regState[rn]  # base addr
 		addr = self.addrNum[x]  # offset
 		dataIndex = ((nc.datStart - rnVal + addr) / 4)  # Fancy doings.
+		# FANCIER DOINGS
+		memIndex = rnVal + (addr * 4)
+		# print 'memIndex:', memIndex
+		datIndexEnd = (memIndex - nc.datStart) / 4
+		# print 'datIndexEnd:', datIndexEnd
+		
 		#TESPRINT
-		print "dataIndex: ", dataIndex
-		print "Size of nc.datState[]", len(nc.datState)
-		print "nc.datState[dataIndex]: ", nc.datState[dataIndex]
-		nc.datState[dataIndex] = rdVal
-		nc.litIns = self.litInstr[x]
-	
+		# print 'pc:', nc.PC
+		# print 'datStart:', nc.datStart
+		# print 'baseAddress:', rnVal
+		# print "dataIndex: ", dataIndex
+		# print 'offset:', addr
+		# print "Size of nc.datState[]", len(nc.datState)
+		
+		testBound = datIndexEnd > len(nc.datState) - 1
+		if not testBound:
+			nc.datState[dataIndex] = rdVal
+			nc.litIns = self.litInstr[x]
+		else:
+			popNum = datIndexEnd - len(nc.datState) + 1
+			# print '\tpopNum:', popNum                       #TESPRINT
+			# print '\trdVal:', rdVal                         #TESPRINT
+			for x in range(0, popNum):
+				nc.datState.append(0)
+			nc.datState[datIndexEnd] = rdVal
+			nc.litIns = self.litInstr[x]
+
 	###############################################################################
 	###############################################################################
 	def doCBZ(self, nc, x):
@@ -855,7 +885,7 @@ class Simulator(object):
 	###############################################################################
 	# FUNCTIONS
 	def run(self, binData):
-		print "\n>>>>>>>>>>> INSIDE SIMULATOR.run(): YOU WILL BE SIMULATED >>>>>>>>>>>>>>>>> "  # TESTPRINT
+		# print "\n>>>>>>>>>>> INSIDE SIMULATOR.run(): YOU WILL BE SIMULATED >>>>>>>>>>>>>>>>> "  # TESTPRINT
 		self.nextCyc = self.Cycle()  # Create first EMPTY cycle (empty regState[]).  Not appended to cycles[].
 		
 		# Grab memory start address.
@@ -863,19 +893,20 @@ class Simulator(object):
 			if self.insType[y] == 'DATA':
 				self.nextCyc.datStart = self.memLines[y]
 				break
-		print 'datStart:', self.nextCyc.datStart        # TESTPRINT
+		# print 'datStart:', self.nextCyc.datStart        # TESTPRINT
 		# Load memory data in first iteration of cycles.  (Only data load, until later instructions.)
 		for y, ins in enumerate(self.opCodeStr):
 			if self.insType[y] == 'DATA':
 				self.nextCyc.datState.append(self.data[y])
-		print 'nextCyc.datState[]...' #TESTPRINT
+		# print 'nextCyc.datState[]...' #TESTPRINT
 		# for x in self.nextCyc.datState:
-		# 	print x
+		# 	print x,
+		print
 		
 		# Load cycles[]
 		self.x = 0
 		while (self.x < self.numLinesText):
-			print 'In while loop...', self.x, ' ... ', self.litInstr[self.x], ' ... ', self.memLines[self.x]
+			# print 'In while loop...', self.x, ' ... ', self.litInstr[self.x], ' ... ', self.memLines[self.x]
 			self.nextCyc = copy.deepcopy(self.nextCyc)
 			######################################## R
 			if self.opCodeStr[self.x] == 'ADD':
