@@ -716,30 +716,38 @@ class Simulator(object):
 	def doLDUR(self, nc, x):
 		# print 'INSIDE LDUR...'
 		nc.PC = self.memLines[x]  # Increment PC to CURRENT instruction.
-		rn = self.rnRegNum[x]  # Base Address in Register
-		# print '\trn:', rn
-		rnVal = nc.regState[rn]  # Base Address
-		# print '\trnVal:', rnVal
+		rn = self.rnRegNum[x]  # Base Address in Register #
+		print '\trn:', rn
+		rnVal = nc.regState[rn]  # Base Address is...
+		print '\trnVal:', rnVal
 		addr = self.addrNum[x]  # Offset
-		# print '\taddr:', addr
-		dataIndex = ((nc.datStart - rnVal + addr) / 4)  # Fancy doings.
+		print '\taddr:', addr
+		memAdr = (addr * 4) + rnVal
+		datAdr = memAdr - nc.datStart
+		datAdr /= 4
+		print '\tdatAdr:  ', datAdr
+		
+		# dataIndex = ((nc.datStart   - rnVal + addr) / 4)  # Fancy doings.
 		# print '\t(datStart - rnVal):', (nc.datStart - rnVal)
 		# print '\tdatStart:', nc.datStart
-		# print '\t'
 		# print '\tdataIndex:', dataIndex
+		# print '\tcontents datState[datIndex]:  ', nc.datState[dataIndex]
+		# print '\tcontents datState[37]:  ', nc.datState[37]
 		
-		testBound = dataIndex > len(nc.datState) - 1
+		testBound = datAdr > len(nc.datState) - 1
 		if not testBound:
-			load = nc.datState[dataIndex]
+			load = nc.datState[datAdr]
+			print '\tload: ', load      # TESTPRINT
 			# print '\tload:', load
 			rd = self.rdRtRegNum[x]
 			nc.regState[rd] = load
 			nc.litIns = self.litInstr[x]
 		else:
-			popNum = dataIndex - len(nc.datState)
+			popNum = datAdr - len(nc.datState)
 			for x in range(0, popNum):
 				nc.datState.append(0)
-			load = nc.datState[dataIndex]
+			load = nc.datState[datAdr]
+			print '\tload: ', load  # TESTPRINT
 			# print '\tload:', load
 			rd = self.rdRtRegNum[x]
 			nc.regState[rd] = load
@@ -763,6 +771,8 @@ class Simulator(object):
 		# print 'datIndexEnd:', datIndexEnd
 		
 		#TESPRINT
+		# print 'self.litInstr:  ', self.litInstr[x]
+		# print 'DOSTUR', '  ', nc.PC
 		# print 'pc:', nc.PC
 		# print 'datStart:', nc.datStart
 		# print 'baseAddress:', rnVal
@@ -807,6 +817,7 @@ class Simulator(object):
 	###############################################################################
 	def doMOVZ(self, nc, x):
 		rd = self.rdRtRegNum[x]
+		nc.PC += 4
 		nc.litIns = self.litInstr[x]
 		nc.regState[rd] = 0
 		nc.regState[rd] = self.immNum[x] * (2 ** self.shiftNum[x])
@@ -814,6 +825,7 @@ class Simulator(object):
 	###############################################################################
 	###############################################################################
 	def doMOVK(self, nc, x):
+		nc.PC += 4
 		BIT_MASK_0 = 0xFFFFFFFFFFFF0000
 		BIT_MASK_1 = 0xFFFFFFFF0000FFFF
 		BIT_MASK_2 = 0xFFFF0000FFFFFFFF
@@ -1013,10 +1025,9 @@ class Simulator(object):
 			for y in range(0, 8):
 				line += str(self.cycles[clockCycle].regState[y + z]) + '\t'
 			print line
-			binData.finalText +=  line + "\n"
+			binData.finalText += line + "\n"
 			z += 8
-		
-		outLine = ''
+
 		print '\nData:' 
 		binData.finalText += '\nData:' + "\n"
 		datStart = self.cycles[0].datStart
@@ -1061,6 +1072,11 @@ def main():
 	                binData.shamNum, binData.rnRegNum, binData.rdRtRegNum, binData.immNum, binData.addrNum,
 	                binData.shiftNum, binData.litInstr, binData.memLines, binData.numLinesText)
 	sim.run(binData)
+	
+	# TESTPRINT
+	print 'LIT INSTRUCTIONS'
+	for x, ins in enumerate(sim.litInstr):
+		print x, '   ', ins
 if __name__== "__main__":
 	main()
 
