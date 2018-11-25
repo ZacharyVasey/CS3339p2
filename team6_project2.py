@@ -715,17 +715,17 @@ class Simulator(object):
 	###############################################################################
 	def doLDUR(self, nc, x):
 		# print 'INSIDE LDUR...'
-		nc.PC = self.memLines[x]  # Increment PC to CURRENT instruction.
-		rn = self.rnRegNum[x]  # Base Address in Register #
-		print '\trn:', rn
-		rnVal = nc.regState[rn]  # Base Address is...
-		print '\trnVal:', rnVal
+		nc.PC = self.memLines[x]        # Increment PC to CURRENT instruction.
+		rn = self.rnRegNum[x]           # Base Address in Register #
+		# print '\trn:', rn             # TESTPRINT
+		rnVal = nc.regState[rn]         # Base Address is...
+		# print '\trnVal:', rnVal       # TESTPRINT
 		addr = self.addrNum[x]  # Offset
-		print '\taddr:', addr
+		# print '\taddr:', addr         # TESTPRINT
 		memAdr = (addr * 4) + rnVal
 		datAdr = memAdr - nc.datStart
 		datAdr /= 4
-		print '\tdatAdr:  ', datAdr
+		# print '\tdatAdr:  ', datAdr     # TESTPRINT
 		
 		# dataIndex = ((nc.datStart   - rnVal + addr) / 4)  # Fancy doings.
 		# print '\t(datStart - rnVal):', (nc.datStart - rnVal)
@@ -737,8 +737,7 @@ class Simulator(object):
 		testBound = datAdr > len(nc.datState) - 1
 		if not testBound:
 			load = nc.datState[datAdr]
-			print '\tload: ', load      # TESTPRINT
-			# print '\tload:', load
+			# print '\tload: ', load      # TESTPRINT
 			rd = self.rdRtRegNum[x]
 			nc.regState[rd] = load
 			nc.litIns = self.litInstr[x]
@@ -747,8 +746,7 @@ class Simulator(object):
 			for x in range(0, popNum):
 				nc.datState.append(0)
 			load = nc.datState[datAdr]
-			print '\tload: ', load  # TESTPRINT
-			# print '\tload:', load
+			# print '\tload: ', load  # TESTPRINT
 			rd = self.rdRtRegNum[x]
 			nc.regState[rd] = load
 			nc.litIns = self.litInstr[x]
@@ -781,9 +779,9 @@ class Simulator(object):
 		# print "Size of nc.datState[]", len(nc.datState)
 		
 		testBound = datIndexEnd > len(nc.datState) - 1
+		nc.litIns = self.litInstr[x]
 		if not testBound:
 			nc.datState[dataIndex] = rdVal
-			nc.litIns = self.litInstr[x]
 		else:
 			popNum = datIndexEnd - len(nc.datState) + 1
 			# print '\tpopNum:', popNum                       #TESPRINT
@@ -791,7 +789,7 @@ class Simulator(object):
 			for x in range(0, popNum):
 				nc.datState.append(0)
 			nc.datState[datIndexEnd] = rdVal
-			nc.litIns = self.litInstr[x]
+			
 
 	###############################################################################
 	###############################################################################
@@ -1073,10 +1071,10 @@ def main():
 	                binData.shiftNum, binData.litInstr, binData.memLines, binData.numLinesText)
 	sim.run(binData)
 	
-	# TESTPRINT
-	print 'LIT INSTRUCTIONS'
-	for x, ins in enumerate(sim.litInstr):
-		print x, '   ', ins
+	# # TESTPRINT
+	# print 'LIT INSTRUCTIONS'
+	# for x, ins in enumerate(sim.litInstr):
+	# 	print x, '   ', ins
 if __name__== "__main__":
 	main()
 
